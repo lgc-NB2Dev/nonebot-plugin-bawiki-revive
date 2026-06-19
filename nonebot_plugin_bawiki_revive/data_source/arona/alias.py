@@ -1,4 +1,5 @@
 import json
+from collections.abc import Iterable
 from pathlib import Path
 
 
@@ -22,7 +23,7 @@ class AliasStore:
     def resolve(self, alias: str) -> str | None:
         return self._read().get(normalize_alias(alias))
 
-    def set_aliases(self, name: str, aliases: list[str]) -> dict[str, str | None]:
+    def set_aliases(self, name: str, aliases: Iterable[str]) -> dict[str, str | None]:
         data = self._read()
         changes: dict[str, str | None] = {}
         for alias in aliases:
@@ -34,7 +35,7 @@ class AliasStore:
         self._write(data)
         return changes
 
-    def delete_aliases(self, aliases: list[str]) -> dict[str, str | None]:
+    def delete_aliases(self, aliases: Iterable[str]) -> dict[str, str | None]:
         data = self._read()
         changes: dict[str, str | None] = {}
         for alias in aliases:

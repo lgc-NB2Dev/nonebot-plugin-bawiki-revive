@@ -12,6 +12,16 @@ from cookit.pyd.compat import get_model_with_config
 from nonebot import get_plugin_config
 from nonebot.plugin import require
 from nonebot_plugin_alconna.uniseg import UniMessage
+from pydantic import Field
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
+    from yarl import URL
+
+require("nonebot_plugin_htmlrender")
+require("nonebot_plugin_picmenu_next")
+
+from nonebot_plugin_htmlrender.consts import RenderBackend
 from nonebot_plugin_picmenu_next.data_source.models import (
     PMDataItem,
     PMNPluginInfo,
@@ -22,6 +32,7 @@ from nonebot_plugin_picmenu_next.templates import (
     BUILTIN_TEMPLATE_DIR,
     detail_templates,
     func_detail_templates,
+    index_templates,
 )
 from nonebot_plugin_picmenu_next.templates.hr_utils import (
     HTMLRENDER_MD_TEMPLATE_DIR,
@@ -36,15 +47,6 @@ from nonebot_plugin_picmenu_next.templates.pw_utils import (
     base_routers,
     local_file_route_prp_transformer,
 )
-from pydantic import Field
-
-if TYPE_CHECKING:
-    from playwright.async_api import Page
-    from yarl import URL
-
-require("nonebot_plugin_htmlrender")
-
-from nonebot_plugin_htmlrender.consts import RenderBackend
 
 AliasCompatModel = get_model_with_config(
     {
@@ -111,6 +113,12 @@ async def _(url: "URL", **_):
     return RES_DIR.joinpath(*url.parts[1:])
 
 
+def version():
+    from .. import __version__
+
+    return __version__
+
+
 async def render(template: str, **kwargs) -> UniMessage:
     template_obj = jj_env.get_template(template)
     html = await template_obj.render_async(
@@ -119,6 +127,7 @@ async def render(template: str, **kwargs) -> UniMessage:
             info=kwargs.get("info"),
             prp_processor=prp_processor,
         ),
+        bawiki_version=version(),
         **kwargs,
     )
     if debug.enabled:
@@ -135,7 +144,21 @@ async def render(template: str, **kwargs) -> UniMessage:
     return UniMessage.image(raw=pic)
 
 
-@detail_templates("bawiki-revive")
+@index_templates("bawiki_revive")
+async def render_index(
+    infos: list[PMNPluginInfo],
+    showing_hidden: bool,
+    user_can_see_hidden: bool | None,
+) -> UniMessage:
+    return await render(
+        "index.html.jinja",
+        infos=infos,
+        showing_hidden=showing_hidden,
+        user_can_see_hidden=user_can_see_hidden,
+    )
+
+
+@detail_templates("bawiki_revive")
 async def render_detail(
     info: PMNPluginInfo,
     info_index: int,
@@ -151,7 +174,7 @@ async def render_detail(
     )
 
 
-@func_detail_templates("bawiki-revive")
+@func_detail_templates("bawiki_revive")
 async def render_func_detail(
     info: PMNPluginInfo,
     info_index: int,

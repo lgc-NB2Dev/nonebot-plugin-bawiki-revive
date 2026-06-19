@@ -21,7 +21,7 @@ if _using_picmenu_next:
 __version__ = "0.0.1"
 __plugin_meta__ = PluginMetadata(
     name="BAWiki Revive",
-    description="蔚蓝档案综合插件 - 堂堂复活（目前只有 Arona 数据源查询）",
+    description="蔚蓝档案综合插件 堂堂复活（还没完全复活 目前只有 Arona 数据源查询）",
     usage=(
         "见下方（注意：所有命令后如有参数，**必须在命令后加空格！**）"
         if _using_picmenu_next
@@ -34,7 +34,7 @@ __plugin_meta__ = PluginMetadata(
     extra={
         "License": "MIT",
         "Author": "LgCuwukii",
-        "pmn": {"markdown": True, "template": "bawiki-revive"},
+        "pmn": {"markdown": True, "template": "bawiki_revive"},
     },
 )
 

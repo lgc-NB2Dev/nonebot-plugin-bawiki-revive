@@ -56,7 +56,8 @@
   /* — Type — */
   --ba-font-display: 'BA-CN', system-ui, sans-serif;
   --ba-font-body: 'BA-CN', system-ui, sans-serif;
-  --ba-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --ba-font-mono:
+    'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'BA-CN', monospace;
 }
 
 * {
@@ -89,17 +90,6 @@ main::before {
     radial-gradient(circle at 60% 100%, rgba(93, 211, 243, 0.2) 0%, transparent 50%);
   pointer-events: none;
   z-index: -2;
-}
-
-main > .bg-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><g fill='none' stroke='%23b1d4e8' stroke-width='0.7' opacity='0.55'><path d='M30 0 L60 30 L30 60 L0 30 Z'/><path d='M30 12 L48 30 L30 48 L12 30 Z'/></g></svg>");
-  background-size: 60px 60px;
-  opacity: 0.55;
-  pointer-events: none;
-  z-index: -1;
-  mix-blend-mode: multiply;
 }
 
 main > .bg-shapes {

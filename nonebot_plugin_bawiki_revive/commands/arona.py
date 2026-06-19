@@ -1,4 +1,12 @@
-from arclet.alconna import Alconna, Args, CommandMeta, MultiVar, Option, store_true
+from arclet.alconna import (
+    Alconna,
+    Args,
+    CommandMeta,
+    MultiVar,
+    Option,
+    StrMulti,
+    store_true,
+)
 from nonebot import logger
 from nonebot.permission import SUPERUSER
 from nonebot_plugin_alconna import Query, on_alconna
@@ -8,18 +16,6 @@ from nonebot_plugin_waiter import prompt
 from ..config import config
 from ..data_source.arona import AronaClient, AronaResponse, AronaResult, alias_store
 from ..utils import pmn_extra
-
-
-def join_params(value: object) -> str:
-    if isinstance(value, tuple | list):
-        return " ".join(str(x) for x in value).strip()
-    return str(value or "").strip()
-
-
-def list_params(value: object) -> list[str]:
-    if isinstance(value, tuple | list):
-        return [str(x).strip() for x in value if str(x).strip()]
-    return [str(value).strip()] if str(value or "").strip() else []
 
 
 async def send_result(result: AronaResult) -> None:
@@ -68,6 +64,11 @@ def select_result(results: list[AronaResult], text: str | None) -> AronaResult |
     return results[index - 1]
 
 
+async def wait_for_query() -> str | None:
+    response = await prompt(QUERY_PROMPT, timeout=config.arona_select_timeout)
+    return response.extract_plain_text().strip() if response is not None else None
+
+
 async def wait_for_choice(message: str) -> str | None:
     response = await prompt(message, timeout=config.arona_select_timeout)
     return response.extract_plain_text().strip() if response is not None else None
@@ -75,7 +76,7 @@ async def wait_for_choice(message: str) -> str | None:
 
 arona_alc = Alconna(
     "arona",
-    Args["query?", MultiVar(str)],
+    Args["query?", StrMulti],
     Option("--r18", action=store_true, help_text="允许返回 R18 结果"),
     meta=CommandMeta(
         description="从 Arona Bot 数据源搜索攻略图或文本，可获取多种信息",
@@ -96,18 +97,22 @@ SELECT_MESSAGES = {
     "invalid": "输入不是数字，已取消选择",
     "out_of_range": "序号超出范围，已取消选择",
 }
+QUERY_PROMPT = "请发送想要搜索的 Arona 攻略关键词"
 
 
 @cmd_arona.handle()
 async def _(
-    query: Query[object] = Query("~query", None),
+    query: Query[str | None] = Query("~query", None),
     q_r18: Query[bool] = Query("~r18.value", default=False),
 ) -> None:
-    text = join_params(query.result)
+    text = query.result
     if not text:
-        await UniMessage.text("请发送想要搜索的 Arona 攻略关键词").finish()
+        text = await wait_for_query() or ""
+    text = text.strip()
+    if not text:
+        await UniMessage.text("未收到 Arona 攻略关键词，已取消").finish()
 
-    use_r18 = bool(q_r18.result)
+    use_r18 = bool(q_r18.available and q_r18.result)
     try:
         response = await search(text, use_r18=use_r18)
     except PermissionError as e:
@@ -118,12 +123,14 @@ async def _(
 
     if result := response.single_result():
         await send_result(result)
+        return
 
     results = response.data
     if not results:
         await UniMessage.text("没有找到相关 Arona 结果").finish()
     if len(results) == 1:
         await send_result(results[0])
+        return
 
     selected = select_result(
         results, await wait_for_choice(build_choice_prompt(results))
@@ -152,9 +159,9 @@ cmd_set_alias = on_alconna(
 @cmd_set_alias.handle()
 async def _(
     name: Query[str] = Query("~name"),
-    aliases: Query[object] = Query("~aliases"),
+    aliases: Query[tuple[str, ...]] = Query("~aliases"),
 ) -> None:
-    alias_list = list_params(aliases.result)
+    alias_list = aliases.result
     if not alias_list:
         await UniMessage.text("请提供至少一个别名").finish()
     changes = alias_store.set_aliases(name.result.strip(), alias_list)
@@ -184,8 +191,8 @@ cmd_del_alias = on_alconna(
 
 
 @cmd_del_alias.handle()
-async def _(aliases: Query[object] = Query("~aliases")) -> None:
-    alias_list = list_params(aliases.result)
+async def _(aliases: Query[tuple[str, ...]] = Query("~aliases")) -> None:
+    alias_list = aliases.result
     if not alias_list:
         await UniMessage.text("请提供至少一个别名").finish()
     changes = alias_store.delete_aliases(alias_list)

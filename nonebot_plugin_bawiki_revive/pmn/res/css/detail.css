@@ -126,10 +126,10 @@ main {
 
 .ba-header-tag {
   font-family: var(--ba-font-display);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.18em;
-  padding: 3px 10px;
+  letter-spacing: 0.1em;
+  padding: 4px 18px;
 }
 
 .ba-header-tag .tag-icon {
@@ -429,7 +429,7 @@ main {
 
 .ba-func-card .func-card-no {
   position: absolute;
-  top: 10px;
+  top: 0px;
   right: 12px;
   display: flex;
   align-items: baseline;
@@ -477,7 +477,7 @@ main {
 }
 
 .ba-func-card h3 {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
   color: var(--ba-text-strong);
 }

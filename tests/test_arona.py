@@ -1,17 +1,59 @@
 import hashlib
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import httpx
 import pytest
+from nonebot.adapters import Event
 from pydantic import ValidationError
 from tenacity.wait import wait_fixed
+
+if TYPE_CHECKING:
+    from nonebug import App
 
 
 def type_validate_python(type_: type[Any], data: Any) -> Any:
     from nonebot.compat import type_validate_python as validate
 
     return validate(type_, data)
+
+
+class FakeMessageEvent(Event):
+    message: Any
+    user_id: str = "user"
+    session_id: str = "session"
+    to_me: bool = True
+
+    def get_type(self) -> str:
+        return "message"
+
+    def get_event_name(self) -> str:
+        return "message"
+
+    def get_event_description(self) -> str:
+        return str(self.message)
+
+    def get_user_id(self) -> str:
+        return self.user_id
+
+    def get_session_id(self) -> str:
+        return self.session_id
+
+    def get_message(self) -> Any:
+        return self.message
+
+    def is_tome(self) -> bool:
+        return self.to_me
+
+
+def make_event(message: str) -> FakeMessageEvent:
+    return FakeMessageEvent(message=make_message(message))
+
+
+def make_message(message: str) -> Any:
+    from nonebot_plugin_alconna.uniseg.fallback import FallbackMessage
+
+    return FallbackMessage(message)
 
 
 def test_config_defaults(bawiki_revive_plugin: object) -> None:  # noqa: ARG001
@@ -414,27 +456,17 @@ def test_arona_alconna_uses_multivar_arguments(
 ) -> None:
     from nonebot_plugin_bawiki_revive.commands import arona as arona_command
 
-    parsed = arona_command.arona_alc.parse("/arona 国际服 未来视")
+    parsed = arona_command.arona_alc.parse("/arona 国际服 未来视 --r18")
     assert parsed.matched
-    assert parsed.query("query") == ("国际服", "未来视")
+    query = parsed.query("query")
+    assert query == "国际服 未来视"
+    assert parsed.query("r18.value") is True
 
     parsed_alias = arona_command.set_alias_alc.parse(
         "/arona设置别名 国际服未来视 别名1 别名2",
     )
     assert parsed_alias.matched
     assert parsed_alias.query("aliases") == ("别名1", "别名2")
-
-
-def test_arona_command_param_helpers(bawiki_revive_plugin: object) -> None:  # noqa: ARG001
-    from nonebot_plugin_bawiki_revive.commands import arona as arona_command
-
-    assert arona_command.join_params(("国际服", "未来视")) == "国际服 未来视"
-    assert arona_command.join_params(None) == ""
-    assert arona_command.list_params((" 别名1 ", "", "别名2")) == [
-        "别名1",
-        "别名2",
-    ]
-    assert arona_command.list_params(" 别名 ") == ["别名"]
 
 
 def test_arona_command_select_result(bawiki_revive_plugin: object) -> None:  # noqa: ARG001
@@ -485,6 +517,77 @@ async def test_arona_command_wait_for_choice_uses_prompt(
 
     assert await arona_command.wait_for_choice("请选择") == "2"
     assert calls == [("请选择", 12.5)]
+
+
+async def test_arona_command_wait_for_query_uses_prompt(
+    bawiki_revive_plugin: object,  # noqa: ARG001
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from nonebot_plugin_bawiki_revive.commands import arona as arona_command
+
+    calls: list[tuple[str, float | None]] = []
+
+    class FakeMessage:
+        def extract_plain_text(self) -> str:
+            return " 国际服未来视 "
+
+    async def fake_prompt(message: str, *, timeout: float | None = None) -> FakeMessage:
+        calls.append((message, timeout))
+        return FakeMessage()
+
+    monkeypatch.setattr(arona_command.config, "arona_select_timeout", 12.5)
+    monkeypatch.setattr(arona_command, "prompt", fake_prompt)
+
+    assert await arona_command.wait_for_query() == "国际服未来视"
+    assert calls == [(arona_command.QUERY_PROMPT, 12.5)]
+
+
+async def test_arona_command_prompts_when_query_missing(
+    app: "App",
+    bawiki_revive_plugin: object,  # noqa: ARG001
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from nonebot_plugin_bawiki_revive.commands import arona as arona_command
+
+    searched: list[tuple[str, bool]] = []
+    sent: list[arona_command.AronaResult] = []
+    prompts: list[float | None] = []
+    result = arona_command.AronaResult(
+        name="国际服未来视",
+        hash="hash123",
+        content="/some/a.png",
+        type="file",
+    )
+
+    class FakeMessage:
+        def extract_plain_text(self) -> str:
+            return " 国际服未来视 "
+
+    async def fake_search(query: str, *, use_r18: bool) -> arona_command.AronaResponse:
+        searched.append((query, use_r18))
+        return arona_command.AronaResponse(code=200, message="OK", data=[result])
+
+    async def fake_send_result(result: arona_command.AronaResult) -> None:
+        sent.append(result)
+
+    async def fake_prompt(message: str, *, timeout: float | None = None) -> FakeMessage:
+        assert message == arona_command.QUERY_PROMPT
+        prompts.append(timeout)
+        return FakeMessage()
+
+    monkeypatch.setattr(arona_command, "search", fake_search)
+    monkeypatch.setattr(arona_command, "send_result", fake_send_result)
+    monkeypatch.setattr(arona_command.config, "arona_select_timeout", 12.5)
+    monkeypatch.setattr(arona_command, "prompt", fake_prompt)
+
+    async with app.test_matcher(arona_command.cmd_arona) as ctx:
+        bot = ctx.create_bot()
+        event = make_event("/arona")
+        ctx.receive_event(bot, event)
+
+    assert searched == [("国际服未来视", False)]
+    assert sent == [result]
+    assert prompts == [12.5]
 
 
 async def test_arona_command_search_resolves_alias(
@@ -639,7 +742,7 @@ def test_metadata_is_picmenu_next_compatible() -> None:
     extra = type_validate_python(PMNPluginExtra, plugin.metadata.extra)
     assert extra.pmn is not None
     assert extra.pmn.markdown is True
-    assert extra.pmn.template == "bawiki-revive"
+    assert extra.pmn.template == "bawiki_revive"
     assert extra.menu_data is None
 
     from nonebot_plugin_picmenu_next.templates import (
@@ -647,8 +750,8 @@ def test_metadata_is_picmenu_next_compatible() -> None:
         func_detail_templates,
     )
 
-    assert "bawiki-revive" in detail_templates.data
-    assert "bawiki-revive" in func_detail_templates.data
+    assert "bawiki_revive" in detail_templates.data
+    assert "bawiki_revive" in func_detail_templates.data
 
     commands: list[Any] = [
         command

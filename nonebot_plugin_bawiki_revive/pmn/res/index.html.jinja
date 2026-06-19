@@ -1,0 +1,88 @@
+{%- extends "base.html.jinja" -%}
+
+{%- block head -%}
+<link rel="stylesheet" href="./css/detail.css" />
+<link rel="stylesheet" href="./css/index.css" />
+{%- endblock -%}
+
+{%- block main -%}
+<div class="ba-index-hero">
+  <div class="ba-header-bar">
+    <div class="ba-tab ba-tab-blue ba-header-tag">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span>SCHALE · INDEX</span>
+    </div>
+    <div class="ba-tab ba-tab-outline ba-header-id">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span>MENU</span>
+    </div>
+  </div>
+  <div class="ba-index-title">
+    <h1>
+      <span class="title-main">机器人帮助菜单</span>
+      <span class="title-underline" aria-hidden="true"></span>
+    </h1>
+    <p>
+      发送
+      <code>{{ cfg.pfx }}帮助{% if showing_hidden %} -H{% endif %} 插件名或序号</code>
+      查看插件详情
+    </p>
+  </div>
+</div>
+
+{% if infos -%}
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>插件列表</span>
+    </h2>
+    <span class="ba-section-count">共 {{ infos | length }} 个</span>
+  </div>
+  <div class="ba-plugin-grid">
+    {% for it in infos -%}
+    {% set is_md = it.pmn.markdown -%}
+    <article class="ba-plugin-card">
+      <div class="plugin-card-corner" aria-hidden="true"></div>
+      <div class="plugin-card-no">
+        <span class="no-prefix">No.</span>
+        <span class="no-num">{{ '%02d' | format(loop.index) }}</span>
+      </div>
+      <div class="plugin-card-head">
+        <span class="plugin-marker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L22 12L12 22L2 12Z" fill="currentColor" />
+            <path d="M12 8L16 12L12 16L8 12Z" fill="#fff" fill-opacity="0.55" />
+          </svg>
+        </span>
+        <h3>{{ it.name }}</h3>
+      </div>
+      {% if it.description -%}
+      <div class="plugin-card-desc md">{{ layout(it.description, is_md) }}</div>
+      {% endif -%}
+      <div class="plugin-card-meta">
+        {% if it.author -%}
+        <span>By {{ it.author }}</span>
+        {% endif -%}
+        {% if it.version -%}
+        <span>v{{ it.version }}</span>
+        {% endif -%}
+        {% if it.pm_data -%}
+        <span>{{ it.pm_data | length }} 项功能</span>
+        {% endif -%}
+      </div>
+    </article>
+    {% endfor -%}
+  </div>
+</section>
+{% else -%}
+<section class="ba-empty-state">
+  <div class="ba-tab ba-tab-yellow empty-tag">
+    <span class="ba-tab-bg" aria-hidden="true"></span>
+    <span>EMPTY</span>
+  </div>
+  <p>当前没有可展示的插件</p>
+</section>
+{% endif -%}
+{%- endblock -%}

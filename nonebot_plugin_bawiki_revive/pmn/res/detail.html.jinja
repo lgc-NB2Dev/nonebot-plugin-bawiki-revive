@@ -1,6 +1,7 @@
 {%- extends "base.html.jinja" -%}
 
 {% set is_md = info.pmn.markdown -%}
+{% set show_header_id = (not func) or (func_index is not none and user_can_see_hidden is not false) -%}
 
 {%- block head -%}
 <link rel="stylesheet" href="./css/detail.css" />
@@ -13,10 +14,14 @@
       <span class="ba-tab-bg" aria-hidden="true"></span>
       <span>SCHALE · PLUGIN</span>
     </div>
+    {% if show_header_id -%}
     <div class="ba-tab ba-tab-outline ba-header-id">
       <span class="ba-tab-bg" aria-hidden="true"></span>
-      <span>No. {{ '%03d' | format(info_index + 1) }}</span>
+      <span>
+        No. {% if func %}{{ '%02d' | format(func_index + 1) }}{% else %}{{ '%02d' | format(info_index + 1) }}{% endif %}
+      </span>
     </div>
+    {% endif -%}
   </div>
   <div class="ba-header-title">
     <h1>
