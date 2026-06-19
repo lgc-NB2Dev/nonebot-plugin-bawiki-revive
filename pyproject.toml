@@ -1,0 +1,22 @@
+[project]
+name = "nonebot-plugin-example"
+dynamic = ["version"]
+description = "Template plugin project"
+authors = [{ name = "LgCuwukii", email = "lgc2333@126.com" }]
+dependencies = ["nonebot2>=2.5.0", "nonebot-plugin-alconna>=0.62.0"]
+requires-python = ">=3.10,<4.0"
+readme = "README.md"
+license = { text = "MIT" }
+
+[project.urls]
+homepage = "https://github.com/lgc-NB2Dev/nonebot-plugin-example"
+
+[dependency-groups]
+dev = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "nonebot_plugin_example/__init__.py"
