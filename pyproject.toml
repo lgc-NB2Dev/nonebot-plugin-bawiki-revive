@@ -1,5 +1,5 @@
 [project]
-name = "nonebot-plugin-example"
+name = "nonebot-plugin-bawiki-revive"
 dynamic = ["version"]
 description = "Template plugin project"
 authors = [{ name = "LgCuwukii", email = "lgc2333@126.com" }]
@@ -9,7 +9,7 @@ readme = "README.md"
 license = { text = "MIT" }
 
 [project.urls]
-homepage = "https://github.com/lgc-NB2Dev/nonebot-plugin-example"
+homepage = "https://github.com/lgc-NB2Dev/nonebot-plugin-bawiki-revive"
 
 [dependency-groups]
 dev = []
@@ -19,4 +19,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "nonebot_plugin_example/__init__.py"
+path = "nonebot_plugin_bawiki_revive/__init__.py"
