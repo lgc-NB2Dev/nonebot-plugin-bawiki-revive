@@ -12,7 +12,7 @@
 
 # NoneBot-Plugin-BAWiki-Revive
 
-_✨ 蔚蓝档案综合插件，堂堂复活（还没完全复活） ✨_
+_✨ 蔚蓝档案综合插件，堂堂复活（并没完全复活） ✨_
 
 <img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="python">
 <a href="https://github.com/astral-sh/uv">
