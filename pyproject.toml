@@ -1,15 +1,27 @@
 [project]
 name = "nonebot-plugin-bawiki-revive"
 dynamic = ["version"]
-description = "Template plugin project"
+description = "BAWiki Revive"
 authors = [{ name = "LgCuwukii", email = "lgc2333@126.com" }]
-dependencies = ["nonebot2>=2.5.0", "nonebot-plugin-alconna>=0.62.0"]
+dependencies = [
+    "cookit[pyd,nonebot-localstore]>=0.13.3",
+    "httpx>=0.28.1",
+    "nonebot2>=2.5.0",
+    "nonebot-plugin-alconna>=0.62.0",
+    "nonebot-plugin-localstore>=0.7.4",
+    "nonebot-plugin-waiter>=0.8.1",
+    "tenacity>=9.1.4",
+]
 requires-python = ">=3.10,<4.0"
 readme = "README.md"
 license = { text = "MIT" }
 
 [project.urls]
 homepage = "https://github.com/lgc-NB2Dev/nonebot-plugin-bawiki-revive"
+
+[project.optional-dependencies]
+menu = ["nonebot-plugin-picmenu-next>=0.4.0"]
+all = ["nonebot-plugin-bawiki-revive[menu]"]
 
 [dependency-groups]
 dev = []
@@ -20,3 +32,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 path = "nonebot_plugin_bawiki_revive/__init__.py"
+
+[tool.pytest.ini_options]
+addopts = ["--cov=nonebot_plugin_bawiki_revive", "--cov-report=term-missing"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+
+[tool.coverage.run]
+source = ["nonebot_plugin_bawiki_revive"]
