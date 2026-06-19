@@ -15,4 +15,5 @@ from .models import (
     AronaResult as AronaResult,
 )
 
-alias_store = AliasStore(ARONA_DATA_DIR / "aliases.json")
+ARONA_ALIAS_PATH = ARONA_DATA_DIR / "aliases.json"
+alias_store = AliasStore(ARONA_ALIAS_PATH)

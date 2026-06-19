@@ -12,6 +12,7 @@ ensure_localstore_path_config()
 
 from .commands import load_commands
 from .config import ConfigModel
+from .legacy_migration import do_legacy_migration
 from .utils import is_using_picmenu_next
 
 _using_picmenu_next = is_using_picmenu_next()
@@ -37,5 +38,7 @@ __plugin_meta__ = PluginMetadata(
         "pmn": {"markdown": True, "template": "bawiki_revive"},
     },
 )
+
+do_legacy_migration()
 
 load_commands()

@@ -392,6 +392,57 @@ def test_alias_store_ignores_empty_aliases(
     assert store.delete_aliases([" ", ""]) == {}
 
 
+def test_alias_store_migrates_legacy_arona_aliases(
+    bawiki_revive_plugin: object,  # noqa: ARG001
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from nonebot_plugin_bawiki_revive import legacy_migration
+    from nonebot_plugin_bawiki_revive.data_source.arona import AliasStore
+
+    legacy_path = tmp_path / "data" / "BAWiki" / "arona_alias.json"
+    legacy_path.parent.mkdir(parents=True)
+    legacy_path.write_text(
+        '{"alias": "国际服未来视", "空白": "室内大蛇"}',
+        encoding="u8",
+    )
+    new_path = tmp_path / "arona" / "aliases.json"
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(legacy_migration, "ARONA_ALIAS_PATH", new_path)
+    legacy_migration.migrate_legacy_aliases()
+    store = AliasStore(new_path)
+
+    assert store.resolve("alias") == "国际服未来视"
+    assert store.resolve("空白") == "室内大蛇"
+    assert not legacy_path.exists()
+
+
+def test_alias_store_keeps_existing_aliases_when_legacy_exists(
+    bawiki_revive_plugin: object,  # noqa: ARG001
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from nonebot_plugin_bawiki_revive import legacy_migration
+    from nonebot_plugin_bawiki_revive.data_source.arona import AliasStore
+
+    legacy_path = tmp_path / "data" / "BAWiki" / "arona_alias.json"
+    legacy_path.parent.mkdir(parents=True)
+    legacy_path.write_text('{"old": "旧数据"}', encoding="u8")
+    new_path = tmp_path / "arona" / "aliases.json"
+    new_path.parent.mkdir(parents=True)
+    new_path.write_text('{"new": "新数据"}', encoding="u8")
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(legacy_migration, "ARONA_ALIAS_PATH", new_path)
+    legacy_migration.migrate_legacy_aliases()
+    store = AliasStore(new_path)
+
+    assert store.resolve("new") == "新数据"
+    assert store.resolve("old") is None
+    assert legacy_path.exists()
+
+
 def test_get_search_r18_rejects_disabled_r18(
     bawiki_revive_plugin: object,  # noqa: ARG001
     monkeypatch: pytest.MonkeyPatch,
