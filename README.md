@@ -185,9 +185,9 @@ PMN_FUNC_DETAIL_TEMPLATE=bawiki_revive
 
 ## 📞 联系
 
-QQ：3076823485
-Telegram：[@lgc2333](https://t.me/lgc2333)
-吹水群：[168603371](https://qm.qq.com/q/EikuZ5sP4G)
+QQ：3076823485  
+Telegram：[@lgc2333](https://t.me/lgc2333)  
+吹水群：[168603371](https://qm.qq.com/q/EikuZ5sP4G)  
 邮箱：<lgc2333@126.com>
 
 ## 💡 鸣谢
