@@ -1,0 +1,383 @@
+/* ============================================================
+   BAWiki Revive · PicMenu template — base styles
+   Aesthetic: Blue Archive UI · Sky cyan + yellow accents
+   ============================================================ */
+
+@font-face {
+  font-family: 'BA-CN';
+  src: url('../fonts/font.otf') format('opentype');
+  font-weight: 400 900;
+  font-display: swap;
+}
+
+:root {
+  /* — Brand palette — */
+  --ba-primary: #118ec9;
+  --ba-primary-light: #5dd3f3;
+  --ba-primary-soft: #b9e6f6;
+  --ba-primary-deep: #0e5c8a;
+  --ba-primary-ink: #08385a;
+
+  --ba-yellow: #ffd93b;
+  --ba-yellow-soft: #ffe770;
+  --ba-yellow-deep: #f5b800;
+
+  --ba-red: #e73d52;
+  --ba-red-soft: #ffe3e7;
+
+  --ba-mint: #5fd6c2;
+
+  /* — Neutrals — */
+  --ba-bg-cool: #eaf4fb;
+  --ba-bg-warm: #f7fbfe;
+  --ba-card-bg: #ffffff;
+  --ba-card-bg-alt: #f4f9fd;
+  --ba-border: #cddfea;
+  --ba-border-soft: #e3eef6;
+  --ba-divider: #d8e6ef;
+
+  /* — Text — */
+  --ba-text: #1b2d44;
+  --ba-text-strong: #0f1d31;
+  --ba-text-sub: #5c7794;
+  --ba-text-muted: #8fa5bc;
+  --ba-text-on-primary: #ffffff;
+
+  /* — Effects — */
+  --ba-shadow-card:
+    0 4px 14px rgba(17, 142, 201, 0.1), 0 1px 3px rgba(15, 29, 49, 0.06);
+  --ba-shadow-card-strong:
+    0 8px 22px rgba(17, 142, 201, 0.18), 0 2px 6px rgba(15, 29, 49, 0.08);
+  --ba-shadow-tab: 0 6px 18px rgba(17, 142, 201, 0.32);
+  --ba-radius: 7px;
+  --ba-radius-lg: 9px;
+  --ba-radius-pill: 999px;
+
+  /* — Type — */
+  --ba-font-display: 'BA-CN', system-ui, sans-serif;
+  --ba-font-body: 'BA-CN', system-ui, sans-serif;
+  --ba-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+}
+
+main {
+  position: relative;
+  width: 810px;
+  height: fit-content;
+  font-family: var(--ba-font-body);
+  color: var(--ba-text);
+  background: linear-gradient(165deg, #d6ecf8 0%, #eaf4fb 30%, #ffffff 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 88% -10%, rgba(255, 217, 59, 0.18) 0%, transparent 32%),
+    radial-gradient(circle at -8% 18%, rgba(17, 142, 201, 0.18) 0%, transparent 38%),
+    radial-gradient(circle at 60% 100%, rgba(93, 211, 243, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -2;
+}
+
+main > .bg-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><g fill='none' stroke='%23b1d4e8' stroke-width='0.7' opacity='0.55'><path d='M30 0 L60 30 L30 60 L0 30 Z'/><path d='M30 12 L48 30 L30 48 L12 30 Z'/></g></svg>");
+  background-size: 60px 60px;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: -1;
+  mix-blend-mode: multiply;
+}
+
+main > .bg-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bg-shapes .shape {
+  position: absolute;
+  display: block;
+  border-radius: 8px;
+  opacity: 0.55;
+  filter: blur(0.3px);
+}
+
+.bg-shapes .shape-a {
+  top: 60px;
+  right: -28px;
+  width: 96px;
+  height: 96px;
+  background: linear-gradient(140deg, #c5e6f5 0%, #ffffff00 70%);
+  transform: rotate(28deg);
+}
+
+.bg-shapes .shape-b {
+  top: 320px;
+  left: -50px;
+  width: 130px;
+  height: 130px;
+  border: 2px solid var(--ba-primary-soft);
+  background: transparent;
+  transform: rotate(20deg);
+  opacity: 0.4;
+}
+
+.bg-shapes .shape-c {
+  bottom: 80px;
+  right: 18px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(160deg, #ffe770 0%, #ffd93b 100%);
+  transform: rotate(45deg);
+  opacity: 0.18;
+}
+
+main > .main-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 24px 18px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--ba-font-display), var(--ba-font-body);
+  letter-spacing: 0.01em;
+}
+
+a {
+  color: var(--ba-primary-deep);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+
+code,
+pre {
+  font-family: var(--ba-font-mono), var(--ba-font-body), monospace;
+  font-feature-settings:
+    'liga' 0,
+    'calt' 0;
+}
+
+/* ===== Footer ===== */
+.main-footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+  font-family: var(--ba-font-display);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ba-text-muted);
+}
+
+.main-footer .footer-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.main-footer .footer-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================
+   Markdown content blocks
+   Inherits the picmenu-next default behaviour but tuned for BA palette
+   ============================================================ */
+
+.md > :nth-child(1) {
+  margin-top: 0;
+}
+
+.md > :nth-last-child(1) {
+  margin-bottom: 0;
+}
+
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+  margin: 14px 0 8px;
+  font-family: var(--ba-font-display);
+  color: var(--ba-text-strong);
+}
+
+.md h1 {
+  font-size: 22px;
+}
+.md h2 {
+  font-size: 19px;
+  border-bottom: 2px solid var(--ba-border);
+  padding-bottom: 4px;
+}
+.md h3 {
+  font-size: 16.5px;
+}
+
+.md p {
+  margin: 8px 0;
+  line-height: 1.65;
+}
+
+.md ul,
+.md ol {
+  margin: 6px 0;
+  padding-left: 22px;
+  line-height: 1.65;
+}
+
+.md li {
+  margin: 2px 0;
+}
+
+.md strong,
+.md b {
+  color: var(--ba-text-strong);
+  font-weight: 700;
+}
+
+.md em,
+.md i {
+  color: var(--ba-primary-deep);
+  font-style: normal;
+  background: linear-gradient(180deg, transparent 60%, var(--ba-yellow-soft) 60%);
+  padding: 0 2px;
+}
+
+.md img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.md :not(pre) > code {
+  display: inline-block;
+  padding: 1px 7px;
+  margin: 0 1px;
+  font-size: 0.92em;
+  color: var(--ba-primary-deep);
+  background: var(--ba-card-bg-alt);
+  border: 1px solid var(--ba-primary-soft);
+  border-radius: 4px;
+  text-shadow: none;
+}
+
+.md pre {
+  margin: 8px 0;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #f4f9fd 0%, #ecf4fa 100%);
+  border: 1px solid var(--ba-border);
+  border-left: 4px solid var(--ba-primary);
+  border-radius: 7px;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+
+.md pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.92em;
+  color: var(--ba-text-strong);
+}
+
+.md blockquote {
+  margin: 10px 0;
+  padding: 6px 14px;
+  color: var(--ba-text-sub);
+  background: rgba(17, 142, 201, 0.06);
+  border-left: 4px solid var(--ba-primary-light);
+  border-radius: 0 6px 6px 0;
+}
+
+.md blockquote > :first-child {
+  margin-top: 0;
+}
+
+.md blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.md hr {
+  border: none;
+  border-top: 1px dashed var(--ba-border);
+  margin: 12px 0;
+}
+
+.md table {
+  border-collapse: collapse;
+  border: 1px solid var(--ba-border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 8px 0;
+}
+
+.md table th,
+.md table td {
+  padding: 8px 12px;
+  border: 1px solid var(--ba-border);
+}
+
+.md table thead {
+  background: linear-gradient(
+    180deg,
+    var(--ba-primary) 0%,
+    var(--ba-primary-deep) 100%
+  );
+  color: var(--ba-text-on-primary);
+}
+
+.md table:not(:has(thead)) tbody > :nth-child(odd),
+.md table:has(thead) tbody > :nth-child(even) {
+  background: var(--ba-card-bg-alt);
+}
+
+.md .math.block {
+  text-align: center;
+}
+
+.md .contains-task-list {
+  list-style: none;
+  padding-left: 8px;
+}
+
+.md .contains-task-list .task-list-item-checkbox {
+  accent-color: var(--ba-primary);
+  margin-right: 6px;
+}

@@ -1,0 +1,190 @@
+{%- extends "base.html.jinja" -%}
+
+{% set is_md = info.pmn.markdown -%}
+
+{%- block head -%}
+<link rel="stylesheet" href="./css/detail.css" />
+{%- endblock -%}
+
+{%- block main -%}
+<div class="ba-header">
+  <div class="ba-header-bar">
+    <div class="ba-tab ba-tab-blue ba-header-tag">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span>SCHALE · PLUGIN</span>
+    </div>
+    <div class="ba-tab ba-tab-outline ba-header-id">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span>No. {{ '%03d' | format(info_index + 1) }}</span>
+    </div>
+  </div>
+  <div class="ba-header-title">
+    <h1>
+      <span class="title-main">{{ info.name }}</span>
+      {% if func -%}
+      <span class="title-divider" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span class="title-func">{{ func.func }}</span>
+      {% endif -%}
+      <span class="title-underline" aria-hidden="true"></span>
+    </h1>
+    {% if info.subtitle %}<p class="ba-header-subtitle">{{ info.subtitle }}</p>{% endif %}
+  </div>
+</div>
+
+{% if func -%}
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>触发方式</span>
+    </h2>
+  </div>
+  <div class="ba-card ba-card-trigger">
+    <div class="trigger-rail" aria-hidden="true"></div>
+    <div class="md">{{ layout(func.trigger_method, is_md) }}</div>
+  </div>
+</section>
+
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>触发条件</span>
+    </h2>
+  </div>
+  <div class="ba-card ba-card-condition">
+    <div class="md">{{ layout(func.trigger_condition, is_md) }}</div>
+  </div>
+</section>
+
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>简要介绍</span>
+    </h2>
+  </div>
+  <div class="ba-card ba-card-brief md">
+    {{ layout(func.brief_des, is_md) }}
+  </div>
+</section>
+
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>详细用法</span>
+    </h2>
+  </div>
+  <div class="ba-card ba-card-detail md">
+    {{ layout(func.detail_des, is_md) }}
+  </div>
+</section>
+{% else -%}
+
+{% if info.description -%}
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>插件简介</span>
+    </h2>
+  </div>
+  <div class="ba-card ba-card-brief md">
+    {{ layout(info.description, is_md) }}
+  </div>
+</section>
+{% endif -%}
+
+{% if info.usage -%}
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>使用方法</span>
+    </h2>
+  </div>
+  <div class="ba-card ba-card-detail md">
+    {{ layout(info.usage, is_md) }}
+  </div>
+</section>
+{% endif -%}
+
+{% if info.pm_data -%}
+<section class="ba-section">
+  <div class="ba-section-header">
+    <h2 class="ba-tab ba-tab-blue">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span class="dot"></span>
+      <span>功能列表</span>
+    </h2>
+    <span class="ba-section-count">共 {{ info.pm_data | length }} 项</span>
+  </div>
+  {% if (not showing_hidden) or user_can_see_hidden -%}
+  <p class="ba-hint">
+    <span class="ba-tab ba-tab-yellow hint-tag">
+      <span class="ba-tab-bg" aria-hidden="true"></span>
+      <span>提示</span>
+    </span>
+    <span class="ba-hint-text">
+      发送
+      <code>{{ cfg.pfx }}帮助{% if showing_hidden %} -H{% endif %} {{ info_index + 1 }} 功能名称或序号</code>
+      查看更多详情
+    </span>
+  </p>
+  {% endif -%}
+  <div class="ba-func-grid">
+    {% for x in info.pm_data -%}
+    <div class="ba-func-card">
+      <div class="func-card-corner" aria-hidden="true"></div>
+      <div class="func-card-no">
+        <span class="no-prefix">No.</span>
+        <span class="no-num">{{ '%02d' | format(loop.index) }}</span>
+      </div>
+      <div class="func-card-head">
+        <span class="func-marker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L22 12L12 22L2 12Z" fill="currentColor" />
+            <path d="M12 8L16 12L12 16L8 12Z" fill="#fff" fill-opacity="0.55" />
+          </svg>
+        </span>
+        <h3>{{ x.func }}</h3>
+      </div>
+      <div class="func-card-meta">
+        <div class="meta-row">
+          <span class="ba-tab ba-tab-blue meta-label">
+            <span class="ba-tab-bg" aria-hidden="true"></span>
+            <span>方式</span>
+          </span>
+          <div class="meta-value md">{{ layout(x.trigger_method, is_md) }}</div>
+        </div>
+        <div class="meta-row">
+          <span class="ba-tab ba-tab-blue meta-label">
+            <span class="ba-tab-bg" aria-hidden="true"></span>
+            <span>条件</span>
+          </span>
+          <div class="meta-value md">{{ layout(x.trigger_condition, is_md) }}</div>
+        </div>
+      </div>
+      <div class="func-card-body">
+        <div class="md">{{ layout(x.brief_des, is_md) }}</div>
+      </div>
+    </div>
+    {% endfor -%}
+  </div>
+</section>
+{% endif -%}
+
+{% endif -%}
+{%- endblock -%}

@@ -1,0 +1,535 @@
+/* ============================================================
+   BAWiki Revive · PicMenu template — detail layout
+   ============================================================ */
+
+main {
+  width: 810px;
+}
+
+/* ============================================================
+   Reusable BA "ba-tab" pattern
+   A wrapper element holds upright text; an inner `.ba-tab-bg`
+   span carries the skewed background, so we keep proper
+   `border-radius` rounded corners AND borders on the parallelogram.
+   ============================================================ */
+
+.ba-tab {
+  --ba-tab-skew: -16deg;
+  --ba-tab-radius: 3px;
+  --ba-tab-pad: 14px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px var(--ba-tab-pad);
+  isolation: isolate;
+}
+
+.ba-tab .ba-tab-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--ba-tab-radius);
+  transform: skewX(var(--ba-tab-skew));
+  transform-origin: center;
+  z-index: -1;
+}
+
+.ba-tab-blue .ba-tab-bg {
+  background: linear-gradient(
+    135deg,
+    var(--ba-primary-deep) 0%,
+    var(--ba-primary) 100%
+  );
+  box-shadow: var(--ba-shadow-tab);
+}
+
+.ba-tab-red .ba-tab-bg {
+  background: linear-gradient(135deg, #ff5870 0%, #c43147 100%);
+  box-shadow: 0 4px 12px rgba(231, 61, 82, 0.32);
+}
+
+.ba-tab-yellow .ba-tab-bg {
+  background: linear-gradient(135deg, var(--ba-yellow-soft) 0%, var(--ba-yellow) 100%);
+  box-shadow: 0 3px 8px rgba(245, 184, 0, 0.3);
+}
+
+.ba-tab-outline .ba-tab-bg {
+  background: var(--ba-card-bg);
+  border: 1.5px solid var(--ba-primary-soft);
+}
+
+.ba-tab-blue,
+.ba-tab-red {
+  color: var(--ba-text-on-primary);
+}
+
+.ba-tab-yellow {
+  color: var(--ba-text-strong);
+}
+
+.ba-tab-outline {
+  color: var(--ba-primary-deep);
+}
+
+/* ============================================================
+   Hero header
+   ============================================================ */
+
+.ba-header {
+  position: relative;
+  padding: 18px 22px;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8fd 100%);
+  border: 1.5px solid var(--ba-border);
+  border-radius: var(--ba-radius-lg);
+  box-shadow: var(--ba-shadow-card-strong);
+  overflow: hidden;
+}
+
+.ba-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--ba-primary-deep) 0%,
+    var(--ba-primary) 35%,
+    var(--ba-primary-light) 70%,
+    var(--ba-yellow) 100%
+  );
+}
+
+.ba-header::after {
+  content: '';
+  position: absolute;
+  top: -42px;
+  right: -42px;
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(
+    135deg,
+    var(--ba-primary-light) 0%,
+    var(--ba-primary) 100%
+  );
+  transform: rotate(45deg);
+  opacity: 0.1;
+}
+
+.ba-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ba-header-tag {
+  font-family: var(--ba-font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 3px 10px;
+}
+
+.ba-header-tag .tag-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--ba-yellow);
+}
+
+.ba-header-id {
+  font-family: var(--ba-font-display);
+  font-size: 13px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  padding: 4px 18px;
+}
+
+.ba-header-title {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.ba-header-title h1 {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--ba-text-strong);
+  padding-bottom: 8px;
+}
+
+.ba-header-title .title-main {
+  background: linear-gradient(
+    135deg,
+    var(--ba-primary-ink) 0%,
+    var(--ba-primary-deep) 70%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ba-header-title .title-divider {
+  display: inline-flex;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--ba-yellow-deep);
+  transform: translateY(2px);
+}
+
+.ba-header-title .title-func {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ba-primary);
+}
+
+.ba-header-title h1 .title-underline {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--ba-yellow) 0%, var(--ba-yellow-soft) 100%);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(255, 217, 59, 0.5);
+}
+
+.ba-header-title h1 .title-underline::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: -1px;
+  width: 7px;
+  height: 7px;
+  background: var(--ba-yellow);
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(255, 217, 59, 0.4);
+}
+
+.ba-header-subtitle {
+  margin-top: 6px;
+  font-family: var(--ba-font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ba-text-sub);
+}
+
+/* ============================================================
+   Section blocks — slanted blue tab title only, no underline
+   ============================================================ */
+
+.ba-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ba-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+}
+
+.ba-section-header h2 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  padding: 6px 12px;
+  margin-left: 6px;
+  --ba-tab-pad: 12px;
+}
+
+.ba-section-header h2 .dot {
+  width: 5px;
+  height: 16px;
+  margin-top: 1px;
+  background: linear-gradient(180deg, var(--ba-yellow-soft) 0%, var(--ba-yellow) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 217, 59, 0.6);
+}
+
+.ba-section-count {
+  font-family: var(--ba-font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ba-text-sub);
+  padding: 2px 8px 2px 14px;
+  background: linear-gradient(90deg, transparent 0%, var(--ba-primary-soft) 100%);
+  border-right: 3px solid var(--ba-primary);
+  margin-left: auto;
+}
+
+/* ============================================================
+   Generic BA-card
+   ============================================================ */
+
+.ba-card {
+  position: relative;
+  padding: 14px 16px;
+  background: var(--ba-card-bg);
+  border: 1.5px solid var(--ba-border);
+  border-radius: var(--ba-radius);
+  box-shadow: var(--ba-shadow-card);
+  line-height: 1.65;
+  color: var(--ba-text);
+}
+
+.ba-card.md > :nth-child(1) {
+  margin-top: 0;
+}
+
+.ba-card.md > :nth-last-child(1) {
+  margin-bottom: 0;
+}
+
+.ba-card-trigger {
+  padding-left: 22px;
+}
+
+.ba-card-trigger .trigger-rail {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 8px;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    var(--ba-primary-light) 0%,
+    var(--ba-primary) 100%
+  );
+  border-radius: 999px;
+}
+
+.ba-card-condition {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ba-card-condition .md {
+  flex: 1;
+  min-width: 0;
+}
+
+.ba-card-brief {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbfd 100%);
+}
+
+.ba-card-detail {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+}
+
+/* ============================================================
+   Hint line
+   ============================================================ */
+
+.ba-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 12px 8px 8px;
+  font-size: 13px;
+  color: var(--ba-text-sub);
+  background: rgba(255, 217, 59, 0.14);
+  border: 1px solid rgba(245, 184, 0, 0.3);
+  border-radius: 6px;
+}
+
+.ba-hint .hint-tag {
+  font-family: var(--ba-font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 14px;
+  --ba-tab-skew: -18deg;
+}
+
+.ba-hint .ba-hint-text {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  line-height: 1.55;
+}
+
+.ba-hint code {
+  font-family: var(--ba-font-mono), monospace;
+  font-size: 12.5px;
+  color: var(--ba-primary-deep);
+  background: var(--ba-card-bg);
+  padding: 2px 8px;
+  border: 1px solid var(--ba-border);
+  border-radius: 4px;
+}
+
+/* ============================================================
+   Function grid — BA "info card" style
+   ============================================================ */
+
+.ba-func-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.ba-func-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 14px;
+  background: var(--ba-card-bg);
+  border: 1.5px solid var(--ba-border);
+  border-radius: var(--ba-radius-lg);
+  box-shadow: var(--ba-shadow-card);
+  overflow: hidden;
+}
+
+.ba-func-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--ba-primary) 0%,
+    var(--ba-primary-light) 60%,
+    var(--ba-yellow) 100%
+  );
+}
+
+.ba-func-card .func-card-corner {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(225deg, rgba(17, 142, 201, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ba-func-card .func-card-no {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-family: var(--ba-font-display);
+  font-style: italic;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(17, 142, 201, 0.1);
+}
+
+.ba-func-card .func-card-no .no-prefix {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ba-primary-light);
+  opacity: 0.7;
+}
+
+.ba-func-card .func-card-no .no-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--ba-primary-light);
+}
+
+.ba-func-card .func-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 70px;
+}
+
+.ba-func-card .func-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--ba-primary);
+  filter: drop-shadow(0 1px 2px rgba(17, 142, 201, 0.3));
+  transform: translateY(-1px);
+}
+
+.ba-func-card .func-marker svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ba-func-card h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ba-text-strong);
+}
+
+.ba-func-card .func-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ba-func-card .meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ba-func-card .meta-label {
+  flex-shrink: 0;
+  width: 52px;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 0;
+  --ba-tab-skew: -16deg;
+  --ba-tab-radius: 2.5px;
+}
+
+.ba-func-card .meta-value {
+  flex: 1;
+  min-width: 0;
+  color: var(--ba-text);
+  word-break: break-word;
+}
+
+.ba-func-card .meta-value.md > p {
+  margin: 0;
+}
+
+.ba-func-card .meta-value code {
+  padding: 1px 4px;
+}
+
+.ba-func-card .func-card-body {
+  flex: 1;
+  font-size: 14px;
+  color: var(--ba-text);
+  line-height: 1.6;
+}
+
+.ba-func-card .func-card-body .md > p {
+  margin: 0;
+}
