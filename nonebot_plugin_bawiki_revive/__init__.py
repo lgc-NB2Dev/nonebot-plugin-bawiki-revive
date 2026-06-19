@@ -14,13 +14,17 @@ from .commands import load_commands
 from .config import ConfigModel
 from .utils import is_using_picmenu_next
 
+_using_picmenu_next = is_using_picmenu_next()
+if _using_picmenu_next:
+    from . import pmn as pmn
+
 __version__ = "0.0.1"
 __plugin_meta__ = PluginMetadata(
     name="BAWiki Revive",
     description="蔚蓝档案综合插件 - 堂堂复活（目前只有 Arona 数据源查询）",
     usage=(
         "见下方（注意：所有命令后如有参数，**必须在命令后加空格！**）"
-        if is_using_picmenu_next()
+        if _using_picmenu_next
         else "安装 picmenu-next 插件获取详细使用帮助"
     ),
     type="application",
@@ -30,7 +34,7 @@ __plugin_meta__ = PluginMetadata(
     extra={
         "License": "MIT",
         "Author": "LgCuwukii",
-        "pmn": {"markdown": True},
+        "pmn": {"markdown": True, "template": "bawiki-revive"},
     },
 )
 

@@ -23,6 +23,7 @@ def check_md5(data: bytes, hash_value: str) -> bool:
 
 
 def is_using_picmenu_next() -> bool:
-    from nonebot import get_available_plugin_names
+    from nonebot import get_available_plugin_names, get_plugin
 
-    return "nonebot_plugin_picmenu_next" in get_available_plugin_names()
+    n = "nonebot_plugin_picmenu_next"
+    return n in get_available_plugin_names() or bool(get_plugin(n))

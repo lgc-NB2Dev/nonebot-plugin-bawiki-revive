@@ -35,9 +35,11 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
 @pytest.fixture
 def bawiki_revive_plugin(app: object) -> object:  # noqa: ARG001
     import nonebot
+    from nonebot import require
 
     if plugin := nonebot.get_plugin("nonebot_plugin_bawiki_revive"):
         return plugin
+    require("nonebot_plugin_picmenu_next")
     try:
         return nonebot.load_plugin("nonebot_plugin_bawiki_revive")
     except RuntimeError as e:

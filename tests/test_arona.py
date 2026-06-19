@@ -622,13 +622,13 @@ async def test_arona_command_send_file_result(
     assert sent == [("image", b"image-bytes")]
 
 
-def test_metadata_is_picmenu_next_compatible(
-    bawiki_revive_plugin: object,  # noqa: ARG001
-) -> None:
+def test_metadata_is_picmenu_next_compatible() -> None:
     from arclet.alconna import command_manager
     from nonebot import require
 
     require("nonebot_plugin_picmenu_next")
+    require("nonebot_plugin_bawiki_revive")
+
     import nonebot
     from nonebot_plugin_picmenu_next.data_source.models import PMNPluginExtra
 
@@ -639,7 +639,16 @@ def test_metadata_is_picmenu_next_compatible(
     extra = type_validate_python(PMNPluginExtra, plugin.metadata.extra)
     assert extra.pmn is not None
     assert extra.pmn.markdown is True
+    assert extra.pmn.template == "bawiki-revive"
     assert extra.menu_data is None
+
+    from nonebot_plugin_picmenu_next.templates import (
+        detail_templates,
+        func_detail_templates,
+    )
+
+    assert "bawiki-revive" in detail_templates.data
+    assert "bawiki-revive" in func_detail_templates.data
 
     commands: list[Any] = [
         command
