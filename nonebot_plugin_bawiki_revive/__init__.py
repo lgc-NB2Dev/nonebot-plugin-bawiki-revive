@@ -12,15 +12,16 @@ ensure_localstore_path_config()
 
 from .commands import load_commands
 from .config import ConfigModel
+from .utils import is_using_picmenu_next
 
 __version__ = "0.0.1"
 __plugin_meta__ = PluginMetadata(
     name="BAWiki Revive",
-    description="碧蓝档案 Arona 攻略查询插件",
+    description="蔚蓝档案综合插件 - 堂堂复活（目前只有 Arona 数据源查询）",
     usage=(
-        "arona <关键词> 查询 Arona Bot 攻略数据源\n"
-        "arona设置别名 <原名> <别名...> 设置本地别名\n"
-        "arona删除别名 <别名...> 删除本地别名"
+        "见下方（注意：所有命令后如有参数，**必须在命令后加空格！**）"
+        if is_using_picmenu_next()
+        else "安装 picmenu-next 插件获取详细使用帮助"
     ),
     type="application",
     homepage="https://github.com/lgc-NB2Dev/nonebot-plugin-bawiki-revive",

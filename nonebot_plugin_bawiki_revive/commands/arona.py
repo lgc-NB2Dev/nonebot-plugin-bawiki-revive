@@ -6,20 +6,8 @@ from nonebot_plugin_alconna.uniseg import UniMessage
 from nonebot_plugin_waiter import prompt
 
 from ..config import config
-from ..data_source.arona import (
-    AronaClient,
-    AronaResponse,
-    AronaResult,
-    alias_store,
-)
+from ..data_source.arona import AronaClient, AronaResponse, AronaResult, alias_store
 from ..utils import pmn_extra
-
-SELECT_MESSAGES = {
-    "timeout": "选择超时，已取消",
-    "cancel": "已取消选择",
-    "invalid": "输入不是数字，已取消选择",
-    "out_of_range": "序号超出范围，已取消选择",
-}
 
 
 def join_params(value: object) -> str:
@@ -90,15 +78,9 @@ arona_alc = Alconna(
     Args["query?", MultiVar(str)],
     Option("--r18", action=store_true, help_text="允许返回 R18 结果"),
     meta=CommandMeta(
-        description="从 Arona Bot 数据源搜索攻略图或文本",
-        usage="arona [--r18] <关键词>",
+        description="从 Arona Bot 数据源搜索攻略图或文本，可获取多种信息",
         example="arona 国际服未来视",
-        extra=pmn_extra(
-            func="Arona攻略查询",
-            trigger_method="`arona` / `Arona`",
-            brief_des="从 Arona Bot 数据源搜索攻略图或文本",
-            detail_des="用法：`arona [--r18] <关键词>`",
-        ),
+        extra=pmn_extra(func="Arona攻略查询"),
     ),
 )
 cmd_arona = on_alconna(
@@ -107,6 +89,13 @@ cmd_arona = on_alconna(
     use_cmd_start=True,
     auto_send_output=True,
 )
+
+SELECT_MESSAGES = {
+    "timeout": "选择超时，已取消",
+    "cancel": "已取消选择",
+    "invalid": "输入不是数字，已取消选择",
+    "out_of_range": "序号超出范围，已取消选择",
+}
 
 
 @cmd_arona.handle()
@@ -149,13 +138,7 @@ set_alias_alc = Alconna(
     Args["name", str]["aliases", MultiVar(str)],
     meta=CommandMeta(
         description="设置 Arona 查询别名",
-        usage="arona设置别名 <原名> <别名...>",
-        extra=pmn_extra(
-            func="Arona别名设置",
-            trigger_method="`arona设置别名` / `Arona设置别名`",
-            brief_des="设置本地 Arona 查询别名",
-            detail_des="用法：`arona设置别名 <原名> <别名...>`",
-        ),
+        extra=pmn_extra(func="Arona别名设置"),
     ),
 )
 cmd_set_alias = on_alconna(
@@ -189,13 +172,7 @@ del_alias_alc = Alconna(
     Args["aliases", MultiVar(str)],
     meta=CommandMeta(
         description="删除 Arona 查询别名",
-        usage="arona删除别名 <别名...>",
-        extra=pmn_extra(
-            func="Arona别名删除",
-            trigger_method="`arona删除别名` / `Arona删除别名`",
-            brief_des="删除本地 Arona 查询别名",
-            detail_des="用法：`arona删除别名 <别名...>`",
-        ),
+        extra=pmn_extra(func="Arona别名删除"),
     ),
 )
 cmd_del_alias = on_alconna(
