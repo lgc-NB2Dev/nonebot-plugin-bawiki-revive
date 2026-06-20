@@ -18,8 +18,8 @@ _✨ 蔚蓝档案综合插件，堂堂复活（并没完全复活） ✨_
 <a href="https://github.com/astral-sh/uv">
   <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv">
 </a>
-<a href="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/f4778875-45a4-4688-8e1b-b8c844440abb">
-  <img src="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/f4778875-45a4-4688-8e1b-b8c844440abb.svg" alt="wakatime">
+<a href="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/b9ad9c44-d425-45e9-b39d-6459107e02dd">
+  <img src="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/b9ad9c44-d425-45e9-b39d-6459107e02dd.svg" alt="wakatime">
 </a>
 
 <br />
