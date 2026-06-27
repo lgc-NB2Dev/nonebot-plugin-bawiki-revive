@@ -17,6 +17,7 @@ To be added
 ## Rules
 
 - Keep test coverage as high as possible to avoid dead code. Code included in the current runtime's coverage scope should be covered unless it is version-specific, dependency-gated, or an intentional error path that is impractical to trigger safely.
+- Async HTTP clients such as `httpx.AsyncClient` subclasses should be used with `async with` or otherwise explicitly closed; do not create a client and immediately call request methods on it without a close boundary.
 
 ## Gotchas
 

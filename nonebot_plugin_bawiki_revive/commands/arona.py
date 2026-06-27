@@ -23,7 +23,8 @@ async def send_result(result: AronaResult) -> None:
         await UniMessage.text(result.content).finish()
     if result.type == "file":
         try:
-            data = await AronaClient().fetch_image(result.content, result.hash)
+            async with AronaClient() as client:
+                data = await client.fetch_image(result.content, result.hash)
         except Exception:
             logger.exception("Failed to fetch Arona image")
             await UniMessage.text("Arona 图片获取失败，请稍后再试").finish()
@@ -39,7 +40,8 @@ def get_search_r18(*, use_r18: bool) -> bool:
 async def search(query: str, *, use_r18: bool) -> AronaResponse:
     r18 = get_search_r18(use_r18=use_r18)
     actual_query = alias_store.resolve(query) or query
-    response = await AronaClient().search(actual_query, r18=r18)
+    async with AronaClient() as client:
+        response = await client.search(actual_query, r18=r18)
     if not response.is_success():
         raise RuntimeError(f"Arona API returned {response.code}: {response.message}")
     return response

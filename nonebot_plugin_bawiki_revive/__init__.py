@@ -19,7 +19,7 @@ _using_picmenu_next = is_using_picmenu_next()
 if _using_picmenu_next:
     from . import pmn as pmn
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __plugin_meta__ = PluginMetadata(
     name="BAWiki Revive",
     description="蔚蓝档案综合插件 堂堂复活（还没完全复活 目前只有 Arona 数据源查询）",

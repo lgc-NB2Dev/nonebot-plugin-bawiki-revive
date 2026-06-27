@@ -1,4 +1,5 @@
 import hashlib
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -398,24 +399,29 @@ def test_alias_store_migrates_legacy_arona_aliases(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from nonebot_plugin_bawiki_revive import legacy_migration
+    from nonebot_plugin_bawiki_revive.data_source import arona
     from nonebot_plugin_bawiki_revive.data_source.arona import AliasStore
 
     legacy_path = tmp_path / "data" / "BAWiki" / "arona_alias.json"
     legacy_path.parent.mkdir(parents=True)
     legacy_path.write_text(
-        '{"alias": "国际服未来视", "空白": "室内大蛇"}',
+        '{"ALIAS": "国际服未来视", " 空白 ": "室内大蛇"}',
         encoding="u8",
     )
     new_path = tmp_path / "arona" / "aliases.json"
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(legacy_migration, "ARONA_ALIAS_PATH", new_path)
+    monkeypatch.setattr(arona, "alias_store", AliasStore(new_path))
     legacy_migration.migrate_legacy_aliases()
     store = AliasStore(new_path)
 
     assert store.resolve("alias") == "国际服未来视"
     assert store.resolve("空白") == "室内大蛇"
-    assert not legacy_path.exists()
+    assert json.loads(new_path.read_text("u8")) == {
+        "alias": "国际服未来视",
+        "空白": "室内大蛇",
+    }
+    assert legacy_path.exists()
 
 
 def test_alias_store_keeps_existing_aliases_when_legacy_exists(
@@ -424,22 +430,62 @@ def test_alias_store_keeps_existing_aliases_when_legacy_exists(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from nonebot_plugin_bawiki_revive import legacy_migration
+    from nonebot_plugin_bawiki_revive.data_source import arona
     from nonebot_plugin_bawiki_revive.data_source.arona import AliasStore
 
     legacy_path = tmp_path / "data" / "BAWiki" / "arona_alias.json"
     legacy_path.parent.mkdir(parents=True)
-    legacy_path.write_text('{"old": "旧数据"}', encoding="u8")
+    legacy_path.write_text(
+        '{"old": "旧数据", "NEW": "旧新数据", " Alias ": "旧别名"}',
+        encoding="u8",
+    )
     new_path = tmp_path / "arona" / "aliases.json"
     new_path.parent.mkdir(parents=True)
-    new_path.write_text('{"new": "新数据"}', encoding="u8")
+    new_path.write_text('{"new": "新数据", "alias": "新别名"}', encoding="u8")
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(legacy_migration, "ARONA_ALIAS_PATH", new_path)
+    monkeypatch.setattr(arona, "alias_store", AliasStore(new_path))
     legacy_migration.migrate_legacy_aliases()
     store = AliasStore(new_path)
 
     assert store.resolve("new") == "新数据"
-    assert store.resolve("old") is None
+    assert store.resolve("old") == "旧数据"
+    assert store.resolve("alias") == "新别名"
+    assert legacy_path.exists()
+
+
+@pytest.mark.parametrize(
+    "legacy_content",
+    [
+        "{not json",
+        '["alias"]',
+        '{"alias": 1}',
+    ],
+)
+def test_alias_store_skips_invalid_legacy_aliases(
+    bawiki_revive_plugin: object,  # noqa: ARG001
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    legacy_content: str,
+) -> None:
+    from nonebot_plugin_bawiki_revive import legacy_migration
+    from nonebot_plugin_bawiki_revive.data_source import arona
+    from nonebot_plugin_bawiki_revive.data_source.arona import AliasStore
+
+    legacy_path = tmp_path / "data" / "BAWiki" / "arona_alias.json"
+    legacy_path.parent.mkdir(parents=True)
+    legacy_path.write_text(legacy_content, encoding="u8")
+    new_path = tmp_path / "arona" / "aliases.json"
+    new_path.parent.mkdir(parents=True)
+    new_path.write_text('{"kept": "保留"}', encoding="u8")
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(arona, "alias_store", AliasStore(new_path))
+    legacy_migration.migrate_legacy_aliases()
+    store = AliasStore(new_path)
+
+    assert store.resolve("kept") == "保留"
+    assert json.loads(new_path.read_text("u8")) == {"kept": "保留"}
     assert legacy_path.exists()
 
 
@@ -655,16 +701,25 @@ async def test_arona_command_search_resolves_alias(
             assert query == "别名"
             return "国际服未来视"
 
-    class FakeAronaClient:
-        async def search(self, name: str, *, r18: bool) -> Any:
-            searched.append((name, r18))
-            return response
+    async def fake_request(
+        self: arona_command.AronaClient,  # noqa: ARG001
+        method: str,  # noqa: ARG001
+        url: str,  # noqa: ARG001
+        **kwargs: Any,
+    ) -> httpx.Response:
+        params = kwargs["params"]
+        searched.append((params["name"], params["r18"] == 1))
+        return httpx.Response(
+            200,
+            json=response.model_dump(),
+            request=httpx.Request(method, url),
+        )
 
     monkeypatch.setattr(arona_command, "get_search_r18", lambda use_r18: use_r18)
     monkeypatch.setattr(arona_command, "alias_store", FakeAliasStore())
-    monkeypatch.setattr(arona_command, "AronaClient", FakeAronaClient)
+    monkeypatch.setattr(arona_command.AronaClient, "request", fake_request)
 
-    assert await arona_command.search("别名", use_r18=True) is response
+    assert await arona_command.search("别名", use_r18=True) == response
     assert searched == [("国际服未来视", True)]
 
 
@@ -678,13 +733,21 @@ async def test_arona_command_search_rejects_unsuccessful_response(
         def resolve(self, query: str) -> str | None:  # noqa: ARG002
             return None
 
-    class FakeAronaClient:
-        async def search(self, name: str, *, r18: bool) -> Any:  # noqa: ARG002
-            return arona_command.AronaResponse(code=500, message="Boom", data=[])
+    async def fake_request(
+        self: arona_command.AronaClient,  # noqa: ARG001
+        method: str,  # noqa: ARG001
+        url: str,  # noqa: ARG001
+        **kwargs: Any,  # noqa: ARG001
+    ) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={"code": 500, "message": "Boom", "data": []},
+            request=httpx.Request(method, url),
+        )
 
     monkeypatch.setattr(arona_command, "get_search_r18", lambda use_r18: use_r18)
     monkeypatch.setattr(arona_command, "alias_store", FakeAliasStore())
-    monkeypatch.setattr(arona_command, "AronaClient", FakeAronaClient)
+    monkeypatch.setattr(arona_command.AronaClient, "request", fake_request)
 
     with pytest.raises(RuntimeError, match="500: Boom"):
         await arona_command.search("国际服未来视", use_r18=False)
@@ -728,11 +791,15 @@ async def test_arona_command_send_plain_result(
 async def test_arona_command_send_file_result(
     bawiki_revive_plugin: object,  # noqa: ARG001
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     from nonebot_plugin_bawiki_revive.commands import arona as arona_command
+    from nonebot_plugin_bawiki_revive.data_source.arona.client import AronaCDNClient
 
     sent: list[tuple[str, str | bytes]] = []
     fetched: list[tuple[str, str]] = []
+    image_data = b"image-bytes"
+    hash_value = hashlib.md5(image_data, usedforsecurity=False).hexdigest()
 
     class FakeMessage:
         def __init__(self, kind: str, value: str | bytes) -> None:
@@ -751,29 +818,34 @@ async def test_arona_command_send_file_result(
         def text(value: str) -> FakeMessage:
             return FakeMessage("text", value)
 
-    class FakeAronaClient:
-        async def fetch_image(
-            self,
-            content: str,
-            hash_value: str,
-        ) -> bytes:
-            fetched.append((content, hash_value))
-            return b"image-bytes"
+    async def fake_request(
+        self: AronaCDNClient,  # noqa: ARG001
+        method: str,  # noqa: ARG001
+        url: str,
+        **kwargs: Any,  # noqa: ARG001
+    ) -> httpx.Response:
+        fetched.append((url, hash_value))
+        return httpx.Response(
+            200, content=image_data, request=httpx.Request(method, url)
+        )
 
     monkeypatch.setattr(arona_command, "UniMessage", FakeUniMessage)
-    monkeypatch.setattr(arona_command, "AronaClient", FakeAronaClient)
+    defaults = arona_command.AronaClient.fetch_image.__kwdefaults__
+    assert defaults is not None
+    monkeypatch.setitem(defaults, "cache_dir", tmp_path)
+    monkeypatch.setattr(AronaCDNClient, "request", fake_request)
 
     await arona_command.send_result(
         arona_command.AronaResult(
             name="图",
-            hash="hash123",
+            hash=hash_value,
             content="/some/a.png",
             type="file",
         ),
     )
 
-    assert fetched == [("/some/a.png", "hash123")]
-    assert sent == [("image", b"image-bytes")]
+    assert fetched == [("some/a.png", hash_value)]
+    assert sent == [("image", image_data)]
 
 
 def test_metadata_is_picmenu_next_compatible() -> None:
